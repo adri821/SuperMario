@@ -7,6 +7,7 @@ TagManager:
   - Ground
   - Coin
   - Goomba
+  - Monedas
   layers:
   - Default
   - TransparentFX

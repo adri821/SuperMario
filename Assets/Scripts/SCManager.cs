@@ -31,6 +31,16 @@ public class SCManager : MonoBehaviour {
 
     // Método para cargar una nueva escena por nombre
     public void LoadScene(string sceneName) {
-        SceneManager.LoadScene(sceneName);
+        if (sceneName.Equals("WorldMap")) {
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneName);
+        }        
+    }
+
+    public void UnloadSceneAsync(string sceneName) {
+        SceneManager.UnloadSceneAsync(sceneName);
     }
 }

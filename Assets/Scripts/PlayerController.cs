@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,10 +19,14 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] float offsetRaycast = 0f;
 
+    // Obtenemos la referencia al sistema de partículas
+    [SerializeField] ParticleSystem jumpParticles;
+
     // Variable privada para el control de saltos
     bool saltar = true;
 
     private void Start() {
+        AudioManager.instance.musicSource.loop = true;
         AudioManager.instance.PlayMusic("MainTheme");
     }
 
@@ -50,14 +55,17 @@ public class PlayerController : MonoBehaviour
 
             // Aplicamos la fuerza física en la coordenada vertical
             rb.AddForce(Vector2.up * fuerzaSalto, ForceMode2D.Impulse);
+
+            // Iniciamos la producción de partículas
+            jumpParticles.Play();
         }
 
         if (Input.GetKeyDown(KeyCode.M)) {
-            SceneManager.LoadScene("WorldMap", LoadSceneMode.Additive);
+            SCManager.instance.LoadScene("WorldMap");
         }
 
         if (Input.GetKeyDown(KeyCode.Z)) {
-            SceneManager.UnloadSceneAsync("WorldMap");
+            SCManager.instance.UnloadSceneAsync("WorldMap");
         }
 
         //Raycast
@@ -110,10 +118,13 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D collision) {
-        if (collision == null) {
+        if (collision != null) {
             if (collision.CompareTag("Coin")) {
                 AudioManager.instance.PlaySFX("CollectCoin");
                 Destroy(collision.gameObject);
+
+                GameManager.monedas++;
+                GameObject.FindGameObjectWithTag("Monedas").GetComponent<TextMeshProUGUI>().text = "Monedas: " + GameManager.monedas.ToString();
             }
         }
     }
@@ -123,9 +134,10 @@ public class PlayerController : MonoBehaviour
         if (collision != null) {
             if (collision.collider.CompareTag("Goomba")) {
                 AudioManager.instance.PlaySFX("Hit");
-                AudioManager.instance.PlayMusic("LostALife");
+                AudioManager.instance.musicSource.loop = false;
+                AudioManager.instance.PlayMusic("LostALife");                
+                GameManager.monedas = 0;
                 SCManager.instance.LoadScene("GameOver");
-
             }
         }
     }
